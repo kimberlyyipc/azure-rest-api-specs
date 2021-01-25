@@ -2534,6 +2534,53 @@
         }
       }
     },
+    "/subscriptions/{subscriptionId}/providers/Microsoft.Compute/locations/{location}/virtualMachineScaleSets": {
+      "get": {
+        "tags": [
+          "VirtualMachineScaleSets"
+        ],
+        "operationId": "VirtualMachineScaleSets_ListByLocation",
+        "description": "Gets all the VM scale sets under the specified subscription for the specified location.",
+        "parameters": [
+          {
+            "name": "location",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "The location for which VM scale sets under the subscription are queried.",
+            "pattern": "^[-\\w\\._]+$"
+          },
+          {
+            "$ref": "#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "#/parameters/SubscriptionIdParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/VirtualMachineScaleSetListResult"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "Lists all the VM scale sets under the specified subscription for the specified location.": {
+            "$ref": "./examples/ListVirtualMachineScaleSetsInASubscriptionByLocation.json"
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
     "/subscriptions/{subscriptionId}/providers/Microsoft.Compute/locations/{location}/vmSizes": {
       "get": {
         "tags": [
@@ -3058,9 +3105,6 @@
           },
           "Create a vm with an extensions time budget.": {
             "$ref": "./examples/CreateAVmWithExtensionsTimeBudget.json"
-          },
-          "Create a vm with Application Profile.": {
-            "$ref": "./examples/CreateAVmWithApplicationProfile.json"
           },
           "Create a VM with Uefi Settings of secureBoot and vTPM.": {
             "$ref": "./examples/CreateAVmWithUefiSettings.json"
@@ -3999,7 +4043,7 @@
         "operationId": "VirtualMachines_InstallPatches",
         "description": "Installs patches on the VM.",
         "x-ms-examples": {
-          "Assess patch state of a virtual machine.": {
+          "Install patch state of a virtual machine.": {
             "$ref": "./examples/VirtualMachineInstallPatches.json"
           }
         },
@@ -4021,7 +4065,7 @@
           {
             "name": "installPatchesInput",
             "in": "body",
-            "required": false,
+            "required": true,
             "schema": {
               "$ref": "#/definitions/VirtualMachineInstallPatchesParameters"
             },
@@ -4170,9 +4214,6 @@
           },
           "Create a scale set with Host Encryption using encryptionAtHost property.": {
             "$ref": "./examples/CreateAScaleSetWithEncryptionAtHost.json"
-          },
-          "Create a scale set with Application Profile": {
-            "$ref": "./examples/CreateAScaleSetWithApplicationProfile.json"
           },
           "Create a scale set with Uefi Settings of secureBoot and vTPM.": {
             "$ref": "./examples/CreateAScaleSetWithUefiSettings.json"
@@ -5621,7 +5662,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/VirtualMachineExtension"
+              "$ref": "#/definitions/VirtualMachineScaleSetVMExtension"
             },
             "description": "Parameters supplied to the Create Virtual Machine Extension operation."
           },
@@ -5636,13 +5677,13 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/VirtualMachineExtension"
+              "$ref": "#/definitions/VirtualMachineScaleSetVMExtension"
             }
           },
           "201": {
             "description": "Created",
             "schema": {
-              "$ref": "#/definitions/VirtualMachineExtension"
+              "$ref": "#/definitions/VirtualMachineScaleSetVMExtension"
             }
           },
           "default": {
@@ -5699,7 +5740,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/VirtualMachineExtensionUpdate"
+              "$ref": "#/definitions/VirtualMachineScaleSetVMExtensionUpdate"
             },
             "description": "Parameters supplied to the Update Virtual Machine Extension operation."
           },
@@ -5714,7 +5755,7 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/VirtualMachineExtension"
+              "$ref": "#/definitions/VirtualMachineScaleSetVMExtension"
             }
           },
           "default": {
@@ -5850,7 +5891,7 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/VirtualMachineExtension"
+              "$ref": "#/definitions/VirtualMachineScaleSetVMExtension"
             }
           },
           "default": {
@@ -5914,7 +5955,7 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/VirtualMachineExtensionsListResult"
+              "$ref": "#/definitions/VirtualMachineScaleSetVMExtensionsListResult"
             }
           },
           "default": {
@@ -7796,6 +7837,30 @@
       ],
       "description": "Describes a Virtual Machine Extension."
     },
+    "VirtualMachineScaleSetVMExtension": {
+      "properties": {
+        "name": {
+          "readOnly": true,
+          "type": "string",
+          "description": "The name of the extension."
+        },
+        "type": {
+          "readOnly": true,
+          "type": "string",
+          "description": "Resource type"
+        },
+        "properties": {
+          "x-ms-client-flatten": true,
+          "$ref": "#/definitions/VirtualMachineExtensionProperties"
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "#/definitions/SubResourceReadOnly"
+        }
+      ],
+      "description": "Describes a VMSS VM Extension."
+    },
     "VirtualMachineExtensionUpdate": {
       "properties": {
         "properties": {
@@ -7810,6 +7875,30 @@
       ],
       "description": "Describes a Virtual Machine Extension."
     },
+    "VirtualMachineScaleSetVMExtensionUpdate": {
+      "properties": {
+        "name": {
+          "readOnly": true,
+          "type": "string",
+          "description": "The name of the extension."
+        },
+        "type": {
+          "readOnly": true,
+          "type": "string",
+          "description": "Resource type"
+        },
+        "properties": {
+          "x-ms-client-flatten": true,
+          "$ref": "#/definitions/VirtualMachineExtensionUpdateProperties"
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "#/definitions/SubResourceReadOnly"
+        }
+      ],
+      "description": "Describes a VMSS VM Extension."
+    },
     "VirtualMachineExtensionsListResult": {
       "properties": {
         "value": {
@@ -7821,6 +7910,18 @@
         }
       },
       "description": "The List Extension operation response"
+    },
+    "VirtualMachineScaleSetVMExtensionsListResult": {
+      "properties": {
+        "value": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/VirtualMachineScaleSetVMExtension"
+          },
+          "description": "The list of VMSS VM extensions"
+        }
+      },
+      "description": "The List VMSS VM Extension operation response"
     },
     "VirtualMachineSoftwarePatchProperties": {
       "properties": {
@@ -7973,7 +8074,6 @@
           "type": "string",
           "description": "Defines when it is acceptable to reboot a VM during a software update operation.",
           "enum": [
-            "Unknown",
             "IfRequired",
             "Never",
             "Always"
@@ -8006,7 +8106,6 @@
           "items": {
             "type": "string",
             "enum": [
-              "Unknown",
               "Critical",
               "Security",
               "UpdateRollUp",
@@ -8056,7 +8155,6 @@
           "items": {
             "type": "string",
             "enum": [
-              "Unknown",
               "Critical",
               "Security",
               "Other"
@@ -8116,6 +8214,7 @@
           "readOnly": true,
           "description": "The reboot state of the VM following completion of the operation.",
           "enum": [
+            "Unknown",
             "NotNeeded",
             "Required",
             "Started",
@@ -8300,6 +8399,19 @@
       ],
       "description": "Describes automatic OS upgrade properties on the image."
     },
+    "VirtualMachineImageFeature": {
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the feature."
+        },
+        "value": {
+          "type": "string",
+          "description": "The corresponding value for the feature."
+        }
+      },
+      "description": "Specifies additional capabilities supported by the image"
+    },
     "VirtualMachineImageProperties": {
       "properties": {
         "plan": {
@@ -8323,6 +8435,12 @@
         "disallowed": {
           "$ref": "#/definitions/DisallowedConfiguration",
           "description": "Specifies disallowed configuration for the VirtualMachine created from the image"
+        },
+        "features": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/VirtualMachineImageFeature"
+          }
         }
       },
       "description": "Describes the properties of a Virtual Machine Image."
@@ -8503,7 +8621,7 @@
       "properties": {
         "vmSize": {
           "type": "string",
-          "description": "Specifies the size of the virtual machine. For more information about virtual machine sizes, see [Sizes for virtual machines](https://docs.microsoft.com/azure/virtual-machines/virtual-machines-windows-sizes?toc=%2fazure%2fvirtual-machines%2fwindows%2ftoc.json). <br><br> The available VM sizes depend on region and availability set. For a list of available sizes use these APIs:  <br><br> [List all available virtual machine sizes in an availability set](https://docs.microsoft.com/rest/api/compute/availabilitysets/listavailablesizes) <br><br> [List all available virtual machine sizes in a region](https://docs.microsoft.com/rest/api/compute/virtualmachinesizes/list) <br><br> [List all available virtual machine sizes for resizing](https://docs.microsoft.com/rest/api/compute/virtualmachines/listavailablesizes)",
+          "description": "Specifies the size of the virtual machine. <br><br> The enum data type is currently deprecated and will be removed by December 23rd 2023. <br><br> Recommended way to get the list of available sizes is using these APIs: <br><br> [List all available virtual machine sizes in an availability set](https://docs.microsoft.com/rest/api/compute/availabilitysets/listavailablesizes) <br><br> [List all available virtual machine sizes in a region]( https://docs.microsoft.com/en-us/rest/api/compute/resourceskus/list) <br><br> [List all available virtual machine sizes for resizing](https://docs.microsoft.com/rest/api/compute/virtualmachines/listavailablesizes). For more information about virtual machine sizes, see [Sizes for virtual machines](https://docs.microsoft.com/en-us/azure/virtual-machines/sizes). <br><br> The available VM sizes depend on region and availability set.",
           "enum": [
             "Basic_A0",
             "Basic_A1",
@@ -9032,48 +9150,6 @@
       },
       "description": "Specifies the storage settings for the virtual machine disks."
     },
-    "VMGalleryApplication": {
-      "properties": {
-        "tags": {
-          "type": "string",
-          "description": "Optional, Specifies a passthrough value for more generic context."
-        },
-        "order": {
-          "type": "integer",
-          "format": "int32",
-          "description": "Optional, Specifies the order in which the packages have to be installed, has no effect if manuallyManaged is set to true"
-        },
-        "manuallyManaged": {
-          "type": "boolean",
-          "default": false,
-          "description": "Specifies whether the gallery application would be manually managed. If set to true, the VMApplicationExtension would not manage the gallery application"
-        },
-        "packageReferenceId": {
-          "type": "string",
-          "description": "Specifies the GalleryApplicationVersion reference in URL form. e.g. /subscriptions/{SubscriptionId}/resourceGroups/{ResourceGroupName}/providers/Microsoft.Compute/galleries/{galleryName}/applications/{application}/versions/{version}"
-        },
-        "configurationReference": {
-          "type": "string",
-          "description": "Optional, Specifies the uri to an azure blob that will replace the default configuration for the package if provided"
-        }
-      },
-      "required": [
-        "packageReferenceId"
-      ],
-      "description": "Specifies the required information to reference a compute gallery application version"
-    },
-    "ApplicationProfile": {
-      "properties": {
-        "galleryApplications": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/VMGalleryApplication"
-          },
-          "description": "Specifies the gallery applications that should be made available to the VM/VMSS"
-        }
-      },
-      "description": "Contains the list of gallery applications that should be made available to the VM/VMSS"
-    },
     "UefiSettings": {
       "properties": {
         "secureBootEnabled": {
@@ -9218,8 +9294,8 @@
           "description": "Specifies additional base-64 encoded XML formatted information that can be included in the Unattend.xml file, which is used by Windows Setup."
         },
         "patchSettings": {
-          "$ref": "#/definitions/WindowsPatchSettings",
-          "description": "Specifies settings related to VM Guest Patching on Windows."
+          "$ref": "#/definitions/PatchSettings",
+          "description": "[Preview Feature] Specifies settings related to VM Guest Patching on Windows."
         },
         "winRM": {
           "$ref": "#/definitions/WinRMConfiguration",
@@ -9269,7 +9345,7 @@
         },
         "patchSettings": {
           "$ref": "#/definitions/LinuxPatchSettings",
-          "description": "Specifies settings related to VM Guest Patching on Linux."
+          "description": "[Preview Feature] Specifies settings related to VM Guest Patching on Linux."
         }
       },
       "description": "Specifies the Linux operating system settings on the virtual machine. <br><br>For a list of supported Linux distributions, see [Linux on Azure-Endorsed Distributions](https://docs.microsoft.com/azure/virtual-machines/virtual-machines-linux-endorsed-distros?toc=%2fazure%2fvirtual-machines%2flinux%2ftoc.json) <br><br> For running non-endorsed distributions, see [Information for Non-Endorsed Distributions](https://docs.microsoft.com/azure/virtual-machines/virtual-machines-linux-create-upload-generic?toc=%2fazure%2fvirtual-machines%2flinux%2ftoc.json)."
@@ -9565,6 +9641,7 @@
           "type": "object",
           "additionalProperties": {
             "type": "object",
+            "x-ms-client-name": "userAssignedIdentitiesValue",
             "properties": {
               "principalId": {
                 "readOnly": true,
@@ -9715,7 +9792,7 @@
         },
         "patchStatus": {
           "$ref": "#/definitions/VirtualMachinePatchStatus",
-          "description": "The status of virtual machine patch operations."
+          "description": "[Preview Feature] The status of virtual machine patch operations."
         }
       },
       "description": "The instance view of a virtual machine."
@@ -9725,10 +9802,6 @@
         "hardwareProfile": {
           "$ref": "#/definitions/HardwareProfile",
           "description": "Specifies the hardware settings for the virtual machine."
-        },
-        "applicationProfile": {
-          "$ref": "#/definitions/ApplicationProfile",
-          "description": "Specifies the gallery applications that should be made available to the VM/VMSS"
         },
         "storageProfile": {
           "$ref": "#/definitions/StorageProfile",
@@ -9803,7 +9876,7 @@
         },
         "licenseType": {
           "type": "string",
-          "description": "Specifies that the image or disk that is being used was licensed on-premises. This element is only used for images that contain the Windows Server operating system. <br><br> Possible values are: <br><br> Windows_Client <br><br> Windows_Server <br><br> If this element is included in a request for an update, the value must match the initial value. This value cannot be updated. <br><br> For more information, see [Azure Hybrid Use Benefit for Windows Server](https://docs.microsoft.com/azure/virtual-machines/virtual-machines-windows-hybrid-use-benefit-licensing?toc=%2fazure%2fvirtual-machines%2fwindows%2ftoc.json) <br><br> Minimum api-version: 2015-06-15"
+          "description": "Specifies that the image or disk that is being used was licensed on-premises. <br><br> Possible values for Windows Server operating system are: <br><br> Windows_Client <br><br> Windows_Server <br><br> Possible values for Linux Server operating system are: <br><br> RHEL_BYOS (for RHEL) <br><br> SLES_BYOS (for SUSE) <br><br> For more information, see [Azure Hybrid Use Benefit for Windows Server](https://docs.microsoft.com/azure/virtual-machines/windows/hybrid-use-benefit-licensing) <br><br> [Azure Hybrid Use Benefit for Linux Server](https://docs.microsoft.com/azure/virtual-machines/linux/azure-hybrid-benefit-linux) <br><br> Minimum api-version: 2015-06-15"
         },
         "vmId": {
           "readOnly": true,
@@ -10021,6 +10094,18 @@
         }
       },
       "description": "Describes a scale-in policy for a virtual machine scale set."
+    },
+    "OrchestrationMode": {
+      "type": "string",
+      "description": "Specifies the orchestration mode for the virtual machine scale set.",
+      "enum": [
+        "Uniform",
+        "Flexible"
+      ],
+      "x-ms-enum": {
+        "name": "OrchestrationMode",
+        "modelAsString": false
+      }
     },
     "ImageOSDisk": {
       "properties": {
@@ -10254,6 +10339,7 @@
           "type": "object",
           "additionalProperties": {
             "type": "object",
+            "x-ms-client-name": "VirtualMachineScaleSetIdentityUserAssignedIdentitiesValue",
             "properties": {
               "principalId": {
                 "readOnly": true,
@@ -11081,10 +11167,6 @@
           "$ref": "#/definitions/VirtualMachineScaleSetOSProfile",
           "description": "Specifies the operating system settings for the virtual machines in the scale set."
         },
-        "applicationProfile": {
-          "$ref": "#/definitions/ApplicationProfile",
-          "description": "Specifies the gallery applications that should be made available to the VM/VMSS"
-        },
         "storageProfile": {
           "$ref": "#/definitions/VirtualMachineScaleSetStorageProfile",
           "description": "Specifies the storage settings for the virtual machine disks."
@@ -11107,7 +11189,7 @@
         },
         "licenseType": {
           "type": "string",
-          "description": "Specifies that the image or disk that is being used was licensed on-premises. This element is only used for images that contain the Windows Server operating system. <br><br> Possible values are: <br><br> Windows_Client <br><br> Windows_Server <br><br> If this element is included in a request for an update, the value must match the initial value. This value cannot be updated. <br><br> For more information, see [Azure Hybrid Use Benefit for Windows Server](https://docs.microsoft.com/azure/virtual-machines/virtual-machines-windows-hybrid-use-benefit-licensing?toc=%2fazure%2fvirtual-machines%2fwindows%2ftoc.json) <br><br> Minimum api-version: 2015-06-15"
+          "description": "Specifies that the image or disk that is being used was licensed on-premises. <br><br> Possible values for Windows Server operating system are: <br><br> Windows_Client <br><br> Windows_Server <br><br> Possible values for Linux Server operating system are: <br><br> RHEL_BYOS (for RHEL) <br><br> SLES_BYOS (for SUSE) <br><br> For more information, see [Azure Hybrid Use Benefit for Windows Server](https://docs.microsoft.com/azure/virtual-machines/windows/hybrid-use-benefit-licensing) <br><br> [Azure Hybrid Use Benefit for Linux Server](https://docs.microsoft.com/azure/virtual-machines/linux/azure-hybrid-benefit-linux) <br><br> Minimum api-version: 2015-06-15"
         },
         "priority": {
           "$ref": "#/definitions/priority",
@@ -11133,10 +11215,6 @@
         "osProfile": {
           "$ref": "#/definitions/VirtualMachineScaleSetUpdateOSProfile",
           "description": "The virtual machine scale set OS profile."
-        },
-        "applicationProfile": {
-          "$ref": "#/definitions/ApplicationProfile",
-          "description": "Specifies the gallery applications that should be made available to the VM/VMSS"
         },
         "storageProfile": {
           "$ref": "#/definitions/VirtualMachineScaleSetUpdateStorageProfile",
@@ -11233,6 +11311,10 @@
         "scaleInPolicy": {
           "$ref": "#/definitions/ScaleInPolicy",
           "description": "Specifies the scale-in policy that decides which virtual machines are chosen for removal when a Virtual Machine Scale Set is scaled-in."
+        },
+        "orchestrationMode": {
+          "$ref": "#/definitions/OrchestrationMode",
+          "description": "Specifies the orchestration mode for the virtual machine scale set."
         }
       },
       "description": "Describes the properties of a Virtual Machine Scale Set."
@@ -11775,10 +11857,6 @@
           "$ref": "#/definitions/HardwareProfile",
           "description": "Specifies the hardware settings for the virtual machine."
         },
-        "applicationProfile": {
-          "$ref": "#/definitions/ApplicationProfile",
-          "description": "Specifies the gallery applications that should be made available to the VM/VMSS"
-        },
         "storageProfile": {
           "$ref": "#/definitions/StorageProfile",
           "description": "Specifies the storage settings for the virtual machine disks."
@@ -11818,7 +11896,7 @@
         },
         "licenseType": {
           "type": "string",
-          "description": "Specifies that the image or disk that is being used was licensed on-premises. This element is only used for images that contain the Windows Server operating system. <br><br> Possible values are: <br><br> Windows_Client <br><br> Windows_Server <br><br> If this element is included in a request for an update, the value must match the initial value. This value cannot be updated. <br><br> For more information, see [Azure Hybrid Use Benefit for Windows Server](https://docs.microsoft.com/azure/virtual-machines/virtual-machines-windows-hybrid-use-benefit-licensing?toc=%2fazure%2fvirtual-machines%2fwindows%2ftoc.json) <br><br> Minimum api-version: 2015-06-15"
+          "description": "Specifies that the image or disk that is being used was licensed on-premises. <br><br> Possible values for Windows Server operating system are: <br><br> Windows_Client <br><br> Windows_Server <br><br> Possible values for Linux Server operating system are: <br><br> RHEL_BYOS (for RHEL) <br><br> SLES_BYOS (for SUSE) <br><br> For more information, see [Azure Hybrid Use Benefit for Windows Server](https://docs.microsoft.com/azure/virtual-machines/windows/hybrid-use-benefit-licensing) <br><br> [Azure Hybrid Use Benefit for Linux Server](https://docs.microsoft.com/azure/virtual-machines/linux/azure-hybrid-benefit-linux) <br><br> Minimum api-version: 2015-06-15"
         },
         "modelDefinitionApplied": {
           "readOnly": true,
@@ -12369,6 +12447,14 @@
         "groupByResourceName": {
           "type": "boolean",
           "description": "Group query result by Resource Name."
+        },
+        "groupByClientApplicationId": {
+          "type": "boolean",
+          "description": "Group query result by Client Application ID."
+        },
+        "groupByUserAgent": {
+          "type": "boolean",
+          "description": "Group query result by User Agent."
         }
       },
       "required": [
@@ -12438,7 +12524,7 @@
         "action"
       ]
     },
-    "WindowsPatchSettings": {
+    "PatchSettings": {
       "properties": {
         "patchMode": {
           "type": "string",
