@@ -28,18 +28,36 @@ These are the global settings for the Maps API.
 title: AzureMapsManagementClient
 description: Azure Maps
 openapi-type: arm
-tag: package-preview-2021-07
+tag: package-2023-06
 ```
 
+
+### Tag: package-2023-06
+
+These settings apply only when `--tag=package-2023-06` is specified on the command line.
+
+```yaml $(tag) == 'package-2023-06'
+input-file:
+  - Microsoft.Maps/stable/2023-06-01/maps-management.json
+```
+### Tag: package-preview-2021-12
+
+These settings apply only when `--tag=package-preview-2021-12` is specified on the command line.
+
+``` yaml $(tag) == 'package-preview-2021-12'
+input-file:
+  - Microsoft.Maps/preview/2021-12-01-preview/maps-management.json
+```
 
 ### Tag: package-preview-2021-07
 
 These settings apply only when `--tag=package-preview-2021-07` is specified on the command line.
 
-```yaml $(tag) == 'package-preview-2021-07'
+``` yaml $(tag) == 'package-preview-2021-07'
 input-file:
   - Microsoft.Maps/preview/2021-07-01-preview/maps-management.json
 ```
+
 ### Tag: package-2021-02
 
 These settings apply only when `--tag=package-2021-02` is specified on the command line.
@@ -87,12 +105,13 @@ This is not used by Autorest itself.
 
 ``` yaml $(swagger-to-sdk)
 swagger-to-sdk:
-  - repo: azure-sdk-for-net
+  - repo: azure-sdk-for-net-track2
   - repo: azure-sdk-for-python-track2
   - repo: azure-sdk-for-go
   - repo: azure-sdk-for-js
   - repo: azure-sdk-for-node
   - repo: azure-resource-manager-schemas
+  - repo: azure-powershell
 ```
 
 ## C#
@@ -206,6 +225,7 @@ directive:
   - suppress: R3006
     where:
       - $.definitions.MapsAccount.properties
+      - $.definitions.Creator.properties
     reason:
       - Currently systemData is not allowed.
   - suppress: R3010
@@ -264,4 +284,6 @@ directive:
       - $.definitions.Dimension.properties.toBeExportedToShoebox
     from: maps-management.json
     reason: standard property being applied to all azure resources.
+  - suppress: MISSING_APIS_IN_DEFAULT_TAG
+    reason: ARM provides the specification for resource move operation. Hence, the operation has been removed from versions after 2018-05-01.
 ```
